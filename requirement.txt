@@ -1,6 +1,6 @@
-streamlit
-opencv-python-headless
-mediapipe
-numpy
-sounddevice
-soundfile
+mediapipe==0.*
+numpy==1.*
+opencv-python-headless==4.*
+sounddevice==0.*
+soundfile==0.*
+streamlit==1.*
