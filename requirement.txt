@@ -1,6 +1,6 @@
 mediapipe==0.10.0
 numpy==1.23.5
-opencv-python-headless==4.7.0.72
+opencv-python
 sounddevice==0.4.6
 soundfile==0.12.1
 streamlit==1.25.0
