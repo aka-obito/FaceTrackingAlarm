@@ -19,13 +19,13 @@ def play_buzzer():
     """
     global is_face_detected
     data, samplerate = sf.read("buzzer.wav")
-    while not buzzer_event.is_set():  # Check if the event is set to stop the thread
+    while not buzzer_event.is_set():
         if is_face_detected and not stop_detection:
             sd.play(data, samplerate)
-            sd.wait()  # Wait for the sound to finish
+            sd.wait()
         else:
-            sd.stop()  # Stop playing if no face is detected or detection is stopped
-    sd.stop()  # Ensure the buzzer stops completely when exiting
+            sd.stop()
+    sd.stop()
 
 def pose():
     """
@@ -77,7 +77,7 @@ def pose():
                     landmark_drawing_spec=None)
 
             # Randomly capture a screenshot if not already taken
-            if not screenshot_taken and random.random() < 0.1:  # 10% chance per frame
+            if not screenshot_taken and random.random() < 0.1:
                 random_screenshot = image.copy()
                 screenshot_taken = True
 
@@ -96,35 +96,52 @@ def pose():
         screenshot_placeholder.image(random_screenshot, channels="BGR", caption="Random Screenshot", use_container_width=True)
 
 # Streamlit interface
-st.title("Face Tracker Anti-theift Alarm Application")
+st.markdown("<h1 style='text-align: center; color: #4CAF50;'>🔒 Face Tracker Anti-Theft Alarm Application</h1>", unsafe_allow_html=True)
 
 # Instructions
-st.markdown("### Instructions:")
-st.write("1. Ensure your webcam is connected.\n2. The application will detect faces and display the live feed. \n3. Use the **Stop Detection** button to end the detection process.")
+st.markdown("<h3 style='color: #2196F3;'>📊 Instructions:</h3>", unsafe_allow_html=True)
+st.write("1. 🛠️ Ensure your webcam is connected.")
+st.write("2. 🎥 The application will detect faces and display the live feed.")
+st.write("3. ⏹️ Use the **Stop Detection** button to end the detection process.")
+st.markdown("---")
+
+# Status indicator
+status_placeholder = st.empty()
+
+def update_status():
+    if is_face_detected:
+        status_placeholder.markdown("<p style='color: green; font-size: 18px;'>😅 Face Detected</p>", unsafe_allow_html=True)
+    else:
+        status_placeholder.markdown("<p style='color: red; font-size: 18px;'>🚫 No Face Detected</p>", unsafe_allow_html=True)
 
 # Placeholders for video feed and screenshot
 frame_placeholder = st.empty()
 screenshot_placeholder = st.empty()
 
-# Button to start and stop the face tracking
-if st.button("Start Face Tracking"):
-    stop_detection = False
-    is_face_detected = False  # Reset face detection
-    screenshot_placeholder.empty()  # Clear any previous screenshot
+# Buttons for starting and stopping
+button_col1, button_col2 = st.columns(2)
+with button_col1:
+    if st.button("🔊 Start Face Tracking", use_container_width=True):
+        stop_detection = False
+        is_face_detected = False
+        screenshot_placeholder.empty()
 
-    # Clear the stop event and start the buzzer in a separate thread
-    buzzer_event.clear()
-    buzzer_thread = threading.Thread(target=play_buzzer)
-    buzzer_thread.daemon = True
-    buzzer_thread.start()
+        # Clear the stop event and start the buzzer in a separate thread
+        buzzer_event.clear()
+        buzzer_thread = threading.Thread(target=play_buzzer)
+        buzzer_thread.daemon = True
+        buzzer_thread.start()
 
-    # Start the pose detection
-    pose()
+        # Start the pose detection
+        pose()
 
-    # Ensure the buzzer stops when detection ends
-    buzzer_event.set()
+        # Ensure the buzzer stops when detection ends
+        buzzer_event.set()
+        update_status()
 
-if st.button("Stop Detection"):
-    stop_detection = True
-    is_face_detected = False  # Ensure face detection stops
-    buzzer_event.set()  # Signal the buzzer thread to stop
+with button_col2:
+    if st.button("❌ Stop Detection", use_container_width=True):
+        stop_detection = True
+        is_face_detected = False
+        buzzer_event.set()
+        update_status()
