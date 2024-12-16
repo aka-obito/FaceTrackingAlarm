@@ -1,6 +1,6 @@
 mediapipe
 numpy
-opencv-python-headless
+opencv-contrib-python
 sounddevice
 soundfile
 streamlit
